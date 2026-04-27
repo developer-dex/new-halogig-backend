@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Support Reply</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f4f4f4; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="padding: 20px 30px; text-align: left;">
+            <img src="<%= data.logo %>" height="28" alt="Halogig Logo" style="border: none;">
+        </div>
+        
+        <div style="padding: 40px 30px;">
+            <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333333; text-align: center;">Support Reply</h2>
+            
+            <p style="margin: 0 0 15px 0; line-height: 1.6;">Hello <%= data.userName %>,</p>
+            
+            <p style="margin: 0 0 20px 0; line-height: 1.6;">You have received a reply from Halogig support for your message:</p>
+            
+            <div style="background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0; margin: 25px 0; overflow: hidden;">
+                <table cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 12px 15px; font-weight: 500; color: #333333; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; width: 25%;">
+                            Your Message:
+                        </td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; background-color: #ffffff; line-height: 1.6;">
+                            <%= data.message %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 15px; font-weight: 500; color: #333333; background-color: #f8f9fa; vertical-align: top;">
+                            Our Reply:
+                        </td>
+                        <td style="padding: 12px 15px; background-color: #ffffff; line-height: 1.6;">
+                            <span style="color: #c3362a;"><%= data.response %></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <p style="margin: 20px 0; line-height: 1.6; font-size: 13px; color: #666666;">
+                If you have any further questions, please don't hesitate to reach out to our support team.
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+            
+            <p style="margin: 0 0 5px 0; color: #666666;">Thanks & Regards,</p>
+            <p style="margin: 0 0 30px 0; color: #666666;">Halogig Team</p>
+            
+            <p style="margin: 0; font-size: 12px; color: #999999; text-align: center;">
+                This is an automated message. Please do not reply to this email.
+            </p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0; font-size: 12px; color: #999999;">
+                © 2025 Halogig. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

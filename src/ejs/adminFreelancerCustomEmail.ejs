@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title><%= data.subject || 'Message from Halogig Admin' %></title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f4f4f4; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="padding: 20px 30px; text-align: left;">
+            <img src="<%= process.env.BACKEND_BASE_URL %>/emailImages/logo.png" height="28" alt="Halogig Logo" style="border: none;">
+        </div>
+        
+        <div style="padding: 40px 30px;">
+            <!-- <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333333; text-align: center;">
+                <%= data.subject || 'Message from Halogig Admin' %>
+            </h2> -->
+            
+            <p style="margin: 0 0 15px 0; line-height: 1.6;">
+                Hello <%= data.userName || 'Freelancer' %>,
+            </p>
+            
+            <p style="margin: 0 0 20px 0; line-height: 1.6; white-space: pre-line;">
+                <%= data.message || '' %>
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+            
+            <p style="margin: 0 0 5px 0; color: #666666;">Best regards,</p>
+            <p style="margin: 0 0 30px 0; color: #666666;">Halogig Admin Team</p>
+            
+            <p style="margin: 0; font-size: 12px; color: #999999; text-align: center;">
+                This is an automated message sent from the Halogig Admin Panel.
+            </p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0; font-size: 12px; color: #999999;">
+                © 2025 Halogig. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

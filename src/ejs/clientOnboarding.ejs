@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Complete Your Profile</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f4f4f4; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="padding: 20px 30px; text-align: left;">
+            <img src="<%= process.env.BACKEND_BASE_URL %>/emailImages/logo.png" height="28" alt="Halogig Logo" style="border: none;">
+        </div>
+        
+        <div style="padding: 40px 30px;">
+            <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333333; text-align: center;">Complete Your Profile</h2>
+            
+            <p style="margin: 0 0 15px 0; line-height: 1.6;">Hello <%= data && data.userName ? data.userName : 'there' %>,</p>
+            
+            <p style="margin: 0 0 20px 0; line-height: 1.6;">Your account has been created by our team. Please complete your primary introduction to get started.</p>
+            
+            <div style="background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center;">
+                <a href="<%= data && data.url ? data.url : '#' %>" style="display: inline-block; background-color: #c3362a; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;" target="_blank" rel="noopener">
+                    Complete Your Profile
+                </a>
+            </div>
+            
+            <p style="margin: 0 0 15px 0; line-height: 1.6; font-size: 13px; color: #666666;">
+                If the button doesn't work, copy and paste this link in your browser:
+            </p>
+            <p style="margin: 0 0 20px 0; word-break: break-all; font-size: 13px; color: #c3362a;">
+                <%= data && data.url ? data.url : '' %>
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+            
+            <p style="margin: 0 0 5px 0; color: #666666;">Best regards,</p>
+            <p style="margin: 0 0 30px 0; color: #666666;">Halogig Team</p>
+            
+            <p style="margin: 0; font-size: 12px; color: #999999; text-align: center;">
+                This is an automated message. Please do not reply to this email.
+            </p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0; font-size: 12px; color: #999999;">
+                © 2025 Halogig. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

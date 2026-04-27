@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>New Project Available - Halogig</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f4f4f4; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="padding: 20px 30px; text-align: left;">
+            <img src="<%= data.logo %>" height="28" alt="Halogig Logo" style="border: none;">
+        </div>
+        
+        <div style="padding: 40px 30px;">
+            <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333333; text-align: center;">New Project Available</h2>
+            
+            <p style="margin: 0 0 15px 0; line-height: 1.6;">Hello <%= data.freelancerName %>,</p>
+            
+            <p style="margin: 0 0 20px 0; line-height: 1.6;">Great news! A new project matching your skills has been posted on Halogig. Here are the details:</p>
+            
+            <div style="background-color: #f8f9fa; border: 2px solid #c3362a; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #c3362a;"><%= data.projectTitle %></h3>
+                
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Project Summary:</p>
+                    <p style="margin: 0; line-height: 1.6; color: #333333;"><%= data.projectSummary || 'No summary provided' %></p>
+                </div>
+                
+                <% if (data.categoryName) { %>
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Category:</p>
+                    <p style="margin: 0; color: #333333;"><%= data.categoryName %></p>
+                </div>
+                <% } %>
+                
+                <% if (data.projectAmount) { %>
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Budget:</p>
+                    <p style="margin: 0; color: #333333; font-size: 16px; font-weight: bold;"><%= data.currencySymbol || '₹' %> <%= data.projectAmount %></p>
+                </div>
+                <% } %>
+                
+                <% if (data.projectDurationMin || data.projectDurationMax) { %>
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Duration:</p>
+                    <p style="margin: 0; color: #333333;">
+                        <% if (data.projectDurationMin && data.projectDurationMax) { %>
+                            <%= data.projectDurationMin %> - <%= data.projectDurationMax %> months
+                        <% } else if (data.projectDurationMin) { %>
+                            <%= data.projectDurationMin %> months
+                        <% } else if (data.projectDurationMax) { %>
+                            <%= data.projectDurationMax %> months
+                        <% } %>
+                    </p>
+                </div>
+                <% } %>
+                
+                <% if (data.technologyPre) { %>
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Technologies:</p>
+                    <p style="margin: 0; color: #333333;"><%= data.technologyPre %></p>
+                </div>
+                <% } %>
+                
+                <% if (data.modelEngagement) { %>
+                <div style="margin: 15px 0;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666666; font-weight: bold;">Engagement Model:</p>
+                    <p style="margin: 0; color: #333333; text-transform: capitalize;"><%= data.modelEngagement %></p>
+                </div>
+                <% } %>
+            </div>
+            
+            <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; font-size: 13px; color: #0c5460;">
+                    💡 <strong>Tip:</strong> Don't miss out on this opportunity! Submit your proposal as soon as possible to increase your chances of being selected.
+                </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+            
+            <p style="margin: 0 0 5px 0; color: #666666;">Best regards,</p>
+            <p style="margin: 0 0 30px 0; color: #666666;">Halogig Team</p>
+            
+            <p style="margin: 0; font-size: 12px; color: #999999; text-align: center;">
+                This is an automated notification. Please do not reply to this email.
+            </p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+            <p style="margin: 0; font-size: 12px; color: #999999;">
+                © 2025 Halogig. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
