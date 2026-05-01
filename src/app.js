@@ -40,6 +40,9 @@ app.use(cors({
   exposedHeaders: ['Content-Disposition'],
 }));
 
+// Explicitly handle preflight so no downstream middleware can redirect it
+app.options('*', cors());
+
 // --------------- Trust Proxy ---------------
 app.set('trust proxy', true);
 
