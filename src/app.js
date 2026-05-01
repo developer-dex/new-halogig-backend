@@ -24,7 +24,7 @@ app.use(cors({
       'https://admin.halogig.com',
       'http://admin.halogig.com',
     ]
-    : true, // allow all origins in development
+    : ['http://uat.halogig.com'], // allow all origins in development
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
