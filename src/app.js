@@ -19,12 +19,21 @@ app.use(cors({
   origin: env.app.environment === 'production'
     ? [
       process.env.FRONTEND_URL || 'https://halogig.com',
+      'https://uat.halogig.com',
+      'http://uat.halogig.com',
       'https://uat.admin.halogig.com',
       'http://uat.admin.halogig.com',
       'https://admin.halogig.com',
       'http://admin.halogig.com',
     ]
-    : ['http://uat.halogig.com'], // allow all origins in development
+    : [
+      'http://uat.halogig.com',
+      'https://uat.halogig.com',
+      'http://uat.admin.halogig.com',
+      'https://uat.admin.halogig.com',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
