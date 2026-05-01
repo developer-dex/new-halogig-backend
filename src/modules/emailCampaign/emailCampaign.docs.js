@@ -20,5 +20,18 @@
  *         name: limit
  *         schema: { type: integer }
  *     responses:
- *       200: { description: List of email campaigns }
+ *       200:
+ *         description: List of email campaigns (returns empty list on error)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 campaigns:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total_count:
+ *                   type: integer
+ *       401: { description: Unauthorized — missing or invalid admin token }
  */

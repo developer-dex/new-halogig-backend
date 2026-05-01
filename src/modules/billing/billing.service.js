@@ -5,6 +5,12 @@ import {
 } from '../../models';
 
 const addBillingDetails = async ({ body, userId }) => {
+  const { billing_name, billing_address, billing_email, billing_contact_number } = body || {};
+  if (!billing_name || !billing_address || !billing_email || !billing_contact_number) {
+    const err = new Error('billing_name, billing_address, billing_email, and billing_contact_number are required');
+    err.statusCode = 400;
+    throw err;
+  }
   const data = { ...body, user_id: userId };
   const existing = await ClientBillingDetails.findOne({ where: { user_id: userId } });
   if (existing) return ClientBillingDetails.update(data, { where: { user_id: userId } });

@@ -51,4 +51,8 @@
  *     responses:
  *       200:
  *         description: List of customer industries
+ *       400:
+ *         description: CustomerIndustries model not available or bad request
+ *       500:
+ *         description: Internal server error
  */

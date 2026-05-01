@@ -16,6 +16,8 @@
  *     responses:
  *       200:
  *         description: Bid created
+ *       409:
+ *         description: Already submitted a bid — freelancer has already bid on this project
  *   get:
  *     summary: Get freelancer bids with pagination
  *     tags: [Bid]
@@ -26,10 +28,17 @@
  *         name: page
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number (minimum 1, defaults to 1 if invalid or missing)
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         description: Items per page (minimum 1, maximum 100, defaults to 10 if invalid or missing)
  *     responses:
  *       200:
  *         description: Paginated bid list
@@ -52,6 +61,30 @@
  *     responses:
  *       200:
  *         description: Bid detail
+ */
+
+/**
+ * @swagger
+ * /freelancer/bids/{id}:
+ *   get:
+ *     summary: Get freelancer bid detail by ID (owner only)
+ *     tags: [Bid]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Bid ID
+ *     responses:
+ *       200:
+ *         description: Bid detail returned successfully
+ *       400:
+ *         description: Bid not found
+ *       403:
+ *         description: Access denied — bid belongs to a different freelancer
  */
 
 /**
@@ -84,7 +117,7 @@
  * @swagger
  * /freelancer/milestone/{id}/send-to-client:
  *   put:
- *     summary: Freelancer sends milestone to client
+ *     summary: Freelancer sends milestone to client (must own the milestone's bid)
  *     tags: [Bid]
  *     security:
  *       - BearerAuth: []
@@ -94,7 +127,22 @@
  *         required: true
  *         schema:
  *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *               freelancer_remarks:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Milestone sent
+ *         description: Milestone sent to client
+ *       403:
+ *         description: Access denied — caller does not own this milestone
+ *       404:
+ *         description: Milestone not found
  */

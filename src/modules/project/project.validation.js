@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 const createClientProject = {
   body: Joi.object().keys({
-    project_title: Joi.string().required(),
+    project_title: Joi.string().min(20).required(),
     project_summary: Joi.string().allow('', null).optional(),
     project_category: Joi.number().integer().allow(null).optional(),
     project_sub_category: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.number())).optional(),
@@ -15,7 +15,19 @@ const createClientProject = {
     currency: Joi.string().allow('', null).optional(),
     location_preferancer: Joi.string().allow('', null).optional(),
     technologty_pre: Joi.string().allow('', null).optional(),
-  }).unknown(true),
+  }).unknown(true).custom((value, helpers) => {
+    const { project_amount_min, project_amount_max } = value;
+    if (
+      project_amount_min !== undefined && project_amount_min !== null &&
+      project_amount_max !== undefined && project_amount_max !== null &&
+      parseFloat(project_amount_max) < parseFloat(project_amount_min)
+    ) {
+      return helpers.error('any.invalid', { message: 'project_amount_max must be greater than or equal to project_amount_min' });
+    }
+    return value;
+  }).messages({
+    'any.invalid': 'project_amount_max must be greater than or equal to project_amount_min',
+  }),
 };
 
 const idParam = {
@@ -48,8 +60,9 @@ const getClientProjectsListing = {
 
 const publishClientProject = {
   body: Joi.object().keys({
-    client_project_id: Joi.number().integer().required(),
-  }),
+    project_id: Joi.number().integer().required(),
+    is_published: Joi.boolean().optional(),
+  }).unknown(true),
 };
 
 const savedProject = {

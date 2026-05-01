@@ -58,6 +58,37 @@
 
 /**
  * @swagger
+ * /user/chat/rooms/{roomId}/messages:
+ *   get:
+ *     summary: Get messages in a chat room (user must be a member)
+ *     tags: [Chat]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: roomId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *     responses:
+ *       200:
+ *         description: Messages retrieved successfully
+ *       403:
+ *         description: Access denied — user is not a member of this chat room
+ */
+
+/**
+ * @swagger
  * /chat/rooms/{roomId}/messages:
  *   post:
  *     summary: Send a message (admin or user)
@@ -86,6 +117,8 @@
  *     responses:
  *       201:
  *         description: Message sent
+ *       400:
+ *         description: Bad request — empty or whitespace-only message, invalid room ID, or access denied
  */
 
 /**

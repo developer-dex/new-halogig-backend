@@ -24,8 +24,11 @@ const updateSow = asyncHandler(async (req, res) => {
 });
 
 const getSowDetail = asyncHandler(async (req, res) => {
-  const result = await sowService.getSowDetail(req.params.id);
-  return result ? ok(req, res, result) : bad(req, res);
+  const result = await sowService.getSowDetail(req.params.id, req.user.id);
+  if (!result) {
+    return res.status(getHttpStatus('FORBIDDEN')).json({ success: false, data: null, message: getMessage(req, false, 'Access denied') });
+  }
+  return ok(req, res, result);
 });
 
 const getAllSow = asyncHandler(async (req, res) => {
@@ -39,7 +42,7 @@ const getAllUserSow = asyncHandler(async (req, res) => {
 });
 
 const deleteSow = asyncHandler(async (req, res) => {
-  const result = await sowService.deleteSow(req.params.id);
+  const result = await sowService.deleteSow(req.params.id, req.user.id);
   return result ? ok(req, res, result) : bad(req, res);
 });
 

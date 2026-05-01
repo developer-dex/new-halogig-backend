@@ -15,7 +15,13 @@ const userRegistration = {
 };
 
 const updateUser = {
-  body: Joi.object().min(1),
+  body: Joi.object().keys({
+    first_name: Joi.string().trim().min(1).required(),
+    last_name: Joi.string().trim().min(1).required(),
+    country: Joi.string().trim().min(1).required(),
+    city: Joi.string().trim().min(1).required(),
+    register_as: Joi.alternatives().try(Joi.string().trim().min(1), Joi.number()).required(),
+  }).unknown(true),
 };
 
 const addOrUpdateReadyMadeApp = {
@@ -28,7 +34,7 @@ const addOrUpdateReadyMadeApp = {
 
 const publishReadyMadeApp = {
   body: Joi.object().keys({
-    project_id: Joi.number().integer().required(),
+    id: Joi.number().integer().required(),
   }),
 };
 

@@ -139,7 +139,8 @@ const updateMaxDeliveryInProgress = asyncHandler(async (req, res) => {
 
 // ---- Billing ----
 const getBillingDetails = asyncHandler(async (req, res) => {
-  return ok(res, await adminService.getBillingDetails(req.params.milestoneId, req.params.projectbidId));
+  const result = await adminService.getBillingDetails(req.params.milestoneId, req.params.projectbidId);
+  return result ? ok(res, result) : notFound(res, 'Milestone or bid not found');
 });
 const saveInvoiceInformation = asyncHandler(async (req, res) => {
   return created(res, await adminService.saveInvoiceInformation(req.body, req.file));

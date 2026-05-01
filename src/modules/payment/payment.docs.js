@@ -30,6 +30,8 @@
  *     responses:
  *       200:
  *         description: Order created
+ *       400:
+ *         description: Invalid or missing amount (must be a positive number)
  *   get:
  *     summary: Get Razorpay order details
  *     tags: [Payment]

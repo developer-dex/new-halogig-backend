@@ -52,9 +52,10 @@ const updateSow = async ({ id, body }) => Sow.update(body, { where: { id } });
 
 /**
  * Get SOW detail with inputs and milestones.
+ * Only returns the SOW if it belongs to the requesting user.
  */
-const getSowDetail = async (projectLeadsId) => Sow.findOne({
-  where: { project_leads_id: projectLeadsId },
+const getSowDetail = async (projectLeadsId, userId) => Sow.findOne({
+  where: { project_leads_id: projectLeadsId, user_id: userId },
   include: [
     { model: SowInput, required: false },
     {
@@ -82,8 +83,18 @@ const getAllUserSow = async (userId) => Sow.findAll({ where: { user_id: userId }
 
 /**
  * Delete a SOW.
+ * Only the SOW owner can delete it — returns null if not found, throws 403 if not owner.
  */
-const deleteSow = async (id) => Sow.destroy({ where: { id } });
+const deleteSow = async (id, userId) => {
+  const sow = await Sow.findOne({ where: { id } });
+  if (!sow) return null;
+  if (sow.user_id !== userId) {
+    const err = new Error('Access denied');
+    err.status = 403;
+    throw err;
+  }
+  return Sow.destroy({ where: { id, user_id: userId } });
+};
 
 export default {
   createSow, updateSow, getSowDetail, getAllSow, getAllUserSow, deleteSow,

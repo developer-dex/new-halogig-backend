@@ -25,6 +25,24 @@
 
 /**
  * @swagger
+ * /admin/website-data/download-excel:
+ *   get:
+ *     summary: Download all website data as an Excel file
+ *     tags: [WebsiteData]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Excel file download
+ *         content:
+ *           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401: { description: Unauthorized }
+ */
+
+/**
+ * @swagger
  * /admin/website-data:
  *   get:
  *     summary: Get all website data (paginated)

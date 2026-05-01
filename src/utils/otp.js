@@ -39,3 +39,16 @@ export const generateRandomString = (length) => {
  * @returns {string}
  */
 export const generateRandomPassword = () => generateRandomString(8);
+
+/**
+ * Generate a 6-digit OTP (alias for compatibility).
+ * @param {number} length
+ * @returns {number}
+ */
+export const generateOTP = (length = 6) => generateRandomInteger(length);
+
+/**
+ * Generate a secure random token for password resets.
+ * @returns {string}
+ */
+export const generateToken = () => generateRandomString(64);

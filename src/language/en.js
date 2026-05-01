@@ -465,5 +465,6 @@ export default {
   READY_MADE_APP_UNPUBLISHED: 'Ready Made App Unpublished Successfully',
   PROJECT_DETAILS_COUNT_SUCCESS: 'Project Details Count Retrieved Successfully',
   PROJECT_DETAILS_COUNT_FAILED: 'Failed To Retrieve Project Details Count',
+  PROJECT_NOT_FOUND: 'Project Not Found',
 
 };

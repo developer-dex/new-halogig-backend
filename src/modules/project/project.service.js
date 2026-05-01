@@ -167,17 +167,29 @@ const updateClientProjectStatus = async ({ id, body }) => {
 };
 
 /**
- * Get client project detail (simple).
+ * Get client project detail (simple) — ownership enforced.
  */
-const getClientProjectDetail = async (id) => ClientProject.findOne({
-  where: { id },
-  include: [{ model: User, required: false, attributes: ['first_name', 'middle_name', 'email', 'last_name', 'username', 'id'] }],
-});
+const getClientProjectDetail = async (id, userId) => {
+  const project = await ClientProject.findOne({
+    where: { id },
+    include: [{ model: User, required: false, attributes: ['first_name', 'middle_name', 'email', 'last_name', 'username', 'id'] }],
+  });
+
+  if (!project) return null; // 404
+
+  if (project.posted_by_user_id !== userId) {
+    const err = new Error('Access denied');
+    err.status = 403;
+    throw err;
+  }
+
+  return project;
+};
 
 /**
  * Public client projects listing with filters and pagination.
  */
-const getClientProjectsListing = async ({ query, userId }) => {
+const getClientProjectsListing = async ({ query = {}, userId }) => {
   const {
     page, limit, model_engagement, customer_industry,
     project_amount_min, project_amount_max, searchText, mainFilter,

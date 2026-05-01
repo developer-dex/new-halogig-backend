@@ -197,6 +197,9 @@ const getUserChatRooms = async (userId, { page = 1, limit = 50 } = {}) => {
  * Get room messages.
  */
 const getRoomMessages = async (roomId, userId, role, { page = 1, limit = 50 } = {}) => {
+  const hasAccess = await checkRoomAccess({ roomId, userId, role });
+  if (!hasAccess) throw new Error('Access denied to this chat room');
+
   const { offset, parsedLimit } = calculatePagination(page, limit);
 
   const messages = await ChatMessage.findAll({
@@ -227,6 +230,12 @@ const sendMessage = async (userId, roomId, messageData, role) => {
   if (!hasAccess) throw new Error('Access denied to this chat room');
 
   const { message, messageType = 'text', fileUrl, fileName, fileSize, replyTo } = messageData;
+
+  // Validate message content
+  if (!message || !message.trim()) {
+    throw new Error('Message content is required');
+  }
+
   const { maskedText, originalText, isPrivacyMasked } = maskPrivacyData(message);
 
   const newMessage = await ChatMessage.create({

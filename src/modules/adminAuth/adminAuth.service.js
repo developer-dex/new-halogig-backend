@@ -45,6 +45,10 @@ const createAdmin = async ({
  * Admin login — validates credentials and sends 2FA OTP.
  */
 const adminLogin = async ({ email, password }) => {
+  if (!email || !password) {
+    return { success: false, message: 'Email and password are required' };
+  }
+
   const admin = await Admin.findOne({ where: { email, status: 'active' } });
   if (!admin) return { success: false, message: 'Invalid email or password' };
 

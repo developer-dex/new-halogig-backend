@@ -18,7 +18,7 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
     });
   }
   return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, 'Industry Already Exist'),
+    success: false, data: null, message: 'Failed to create order',
   });
 });
 
@@ -34,7 +34,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
     });
   }
   return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, 'Industry Already Exist'),
+    success: false, data: null, message: 'Payment verification failed',
   });
 });
 
@@ -51,7 +51,7 @@ const getRazorpayOrderDetails = asyncHandler(async (req, res) => {
     });
   }
   return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, 'Industry Already Exist'),
+    success: false, data: null, message: 'Order not found',
   });
 });
 
@@ -69,7 +69,7 @@ const getAllTransaction = asyncHandler(async (req, res) => {
     });
   }
   return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, 'Industry Already Exist'),
+    success: false, data: null, message: 'Failed to retrieve transactions',
   });
 });
 

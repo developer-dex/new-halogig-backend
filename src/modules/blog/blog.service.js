@@ -36,7 +36,8 @@ const getAllBlogs = async (query) => {
  */
 const getBlogBySlug = async (slug) => {
   const sanitizedSlug = slug.replace(/[^a-zA-Z0-9-_]/g, '');
-  const blog = await Blog.findOne({ where: { slug: sanitizedSlug } });
+  if (!sanitizedSlug) return null;
+  const blog = await Blog.findOne({ where: { blog_slug: sanitizedSlug } });
   if (!blog) return null;
   const blogData = blog.toJSON();
   if (blogData.image) blogData.imageUrl = `${BACKEND_BASE_URL}/blogImages/${blogData.image}`;

@@ -233,6 +233,8 @@ const updateFreelancerPrimaryIntroduction = async (userId, data) => {
 };
 
 const updateFreelancerProfessionalExperience = async (userId, data) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
   const existing = await ProfessionalDetail.findOne({ where: { user_id: userId } });
   if (existing) { await existing.update(data); return existing; }
   return ProfessionalDetail.create({ ...data, user_id: userId });
@@ -246,6 +248,8 @@ const updateFreelancerProjects = async (userId, data) => {
 };
 
 const updateFreelancerEducation = async (userId, data) => {
+  const user = await User.findByPk(userId);
+  if (!user) return null;
   const existing = await Education.findOne({ where: { user_id: userId } });
   if (existing) { await existing.update(data); return existing; }
   return Education.create({ ...data, user_id: userId });
@@ -297,7 +301,9 @@ const updateMaxDeliveryInProgress = async (userId, maxDeliveryInProgress) => {
 // ---- Billing ----
 const getBillingDetails = async (milestoneId, projectbidId) => {
   const milestone = await ProjectBidMilestone.findByPk(milestoneId);
+  if (!milestone) return null;
   const bid = await ProjectBid.findByPk(projectbidId);
+  if (!bid) return null;
   return { milestone, bid };
 };
 
@@ -399,10 +405,15 @@ const getWebsiteDataSlugs = async () => {
 };
 
 const getEmailCampaigns = async (query) => {
-  const { page, limit } = query;
-  const { offset, parsedLimit } = calculatePagination(page, limit);
-  const { count, rows } = await EmailCampaign.findAndCountAll({ order: [['createdAt', 'DESC']], offset, limit: parsedLimit });
-  return { total: count, campaigns: rows, page: Number(page) || 1, limit: parsedLimit };
+  try {
+    const { page, limit } = query;
+    const { offset, parsedLimit } = calculatePagination(page, limit);
+    const { count, rows } = await EmailCampaign.findAndCountAll({ order: [['createdAt', 'DESC']], offset, limit: parsedLimit });
+    return { total: count, campaigns: rows, page: Number(page) || 1, limit: parsedLimit };
+  } catch (error) {
+    console.error('getEmailCampaigns error:', error);
+    return { campaigns: [], total_count: 0 };
+  }
 };
 
 const markUserViewedByAdmin = async (userId) => {

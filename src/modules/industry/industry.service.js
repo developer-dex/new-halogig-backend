@@ -24,6 +24,9 @@ const getAllIndustries = async () => {
  * @returns {Promise<Array>}
  */
 const getCustomerIndustries = async () => {
+  if (!CustomerIndustries) {
+    throw new Error('CustomerIndustries model not available');
+  }
   const industries = await CustomerIndustries.findAll();
   return industries;
 };

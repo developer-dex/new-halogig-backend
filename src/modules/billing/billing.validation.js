@@ -2,8 +2,10 @@ import Joi from 'joi';
 
 const addBillingDetails = {
   body: Joi.object().keys({
-    billing_name: Joi.string().allow('', null).optional(),
-    billing_address: Joi.string().allow('', null).optional(),
+    billing_name: Joi.string().required(),
+    billing_address: Joi.string().required(),
+    billing_email: Joi.string().email().required(),
+    billing_contact_number: Joi.string().required(),
     billing_city: Joi.string().allow('', null).optional(),
     billing_state: Joi.string().allow('', null).optional(),
     billing_country: Joi.string().allow('', null).optional(),

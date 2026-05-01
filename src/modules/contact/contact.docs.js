@@ -25,17 +25,23 @@
  *             properties:
  *               firstName:
  *                 type: string
+ *                 minLength: 1
  *                 maxLength: 255
+ *                 description: Must not be whitespace-only
  *               lastName:
  *                 type: string
+ *                 minLength: 1
  *                 maxLength: 255
+ *                 description: Must not be whitespace-only
  *               email:
  *                 type: string
  *                 format: email
  *                 maxLength: 255
  *               mobile:
  *                 type: string
+ *                 minLength: 1
  *                 maxLength: 50
+ *                 description: Must not be whitespace-only
  *               companyName:
  *                 type: string
  *                 maxLength: 255

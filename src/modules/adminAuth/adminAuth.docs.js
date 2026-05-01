@@ -27,6 +27,8 @@
  *     responses:
  *       200:
  *         description: OTP sent to email
+ *       400:
+ *         description: Missing email or password
  *       401:
  *         description: Invalid credentials
  */

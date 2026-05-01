@@ -5,6 +5,7 @@ import userService from './user.service';
 
 const ok = (req, res, data, msgKey = 'SIGNUP') => res.status(getHttpStatus('OK')).json({ success: true, data, message: getMessage(req, false, msgKey) });
 const bad = (req, res, msgKey = 'FALSE_RESPONSE') => res.status(getHttpStatus('BAD_REQUEST')).json({ success: false, data: null, message: getMessage(req, false, msgKey) });
+const notFound = (req, res, msgKey = 'NOT_FOUND') => res.status(getHttpStatus('NOT_FOUND')).json({ success: false, data: null, message: getMessage(req, false, msgKey) });
 
 const userRegistration = asyncHandler(async (req, res) => {
   const userId = req.user?.id || req.body.id;
@@ -44,7 +45,11 @@ const getUserDetailByToken = asyncHandler(async (req, res) => {
 });
 
 const publishReadyMadeApp = asyncHandler(async (req, res) => {
-  const result = await userService.publishReadyMadeApp(req.body.project_id);
+  const { id } = req.body;
+  if (!id) {
+    return res.status(400).json({ success: false, data: null, message: 'id is required' });
+  }
+  const result = await userService.publishReadyMadeApp(id);
   return result ? ok(req, res, result, 'READY_MADE_APP_PUBLISHED') : bad(req, res);
 });
 
@@ -74,7 +79,7 @@ const userEducation = asyncHandler(async (req, res) => {
 });
 const getEducation = asyncHandler(async (req, res) => {
   const result = await userService.getEducation(req.user.id);
-  return result ? ok(req, res, result) : bad(req, res);
+  return ok(req, res, result);
 });
 
 // Professional Detail
@@ -157,7 +162,10 @@ const getAllCategory = asyncHandler(async (req, res) => {
   return result ? ok(req, res, result) : bad(req, res);
 });
 const getAllSubCategory = asyncHandler(async (req, res) => {
-  const categoryId = req.params.id || null;
+  const categoryId = req.params.id;
+  if (!categoryId) {
+    return res.status(400).json({ success: false, message: 'category_id is required' });
+  }
   const result = await userService.getAllSubCategory(categoryId);
   return result ? ok(req, res, result) : bad(req, res);
 });
@@ -169,7 +177,7 @@ const userApplication = asyncHandler(async (req, res) => {
 });
 const userApplicationDetail = asyncHandler(async (req, res) => {
   const result = await userService.getUserDetail(req.params.id);
-  return result ? ok(req, res, result) : bad(req, res);
+  return result ? ok(req, res, result) : notFound(req, res);
 });
 
 export default {

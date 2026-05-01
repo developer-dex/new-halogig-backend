@@ -49,21 +49,31 @@ const getIndustry = asyncHandler(async (req, res) => {
  * GET /api/customerIndustry
  */
 const getCustomerIndustries = asyncHandler(async (req, res) => {
-  const result = await industryService.getCustomerIndustries();
+  try {
+    const result = await industryService.getCustomerIndustries();
 
-  if (result) {
-    return res.status(getHttpStatus('OK')).json({
-      success: true,
-      data: result,
-      message: getMessage(req, false, ''),
+    if (result) {
+      return res.status(getHttpStatus('OK')).json({
+        success: true,
+        data: result,
+        message: getMessage(req, false, ''),
+      });
+    }
+
+    return res.status(getHttpStatus('BAD_REQUEST')).json({
+      success: false,
+      data: null,
+      message: getMessage(req, false, 'Industry Already Exist'),
     });
+  } catch (error) {
+      return res.status(getHttpStatus('BAD_REQUEST')).json({
+        success: false,
+        data: null,
+        message: 'CustomerIndustries model not available',
+      });
+    
+    throw error;
   }
-
-  return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false,
-    data: null,
-    message: getMessage(req, false, 'Industry Already Exist'),
-  });
 });
 
 export default {

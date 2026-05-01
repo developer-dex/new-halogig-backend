@@ -262,7 +262,15 @@ const userEducation = async ({ body, userId }) => {
   return true;
 };
 
-const getEducation = async (userId) => Education.findAll({ where: { userId } });
+const getEducation = async (userId) => {
+  try {
+    const education = await Education.findAll({ where: { userId } });
+    return education || [];
+  } catch (error) {
+    console.error('getEducation error:', error);
+    return [];
+  }
+};
 
 // ---- Professional Detail ----
 const userProfessionalDetail = async ({ body, userId }) => {

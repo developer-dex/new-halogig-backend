@@ -7,6 +7,11 @@ const createDispute = async ({ body, userId }) => {
   if (!body.projectId || !body.projectBidId) throw new Error('Missing required fields: projectId and projectBidId');
 
   const bidDetails = await ProjectBid.findOne({ where: { id: body.projectBidId } });
+  if (!bidDetails) {
+    const err = new Error('Project bid not found');
+    err.status = 400;
+    throw err;
+  }
   const disputeData = {
     dispute_by: userId,
     dispute_for: body.generatedBy === 'freelancer' ? bidDetails.client_id : bidDetails.from_user_id,

@@ -67,6 +67,26 @@ const checkUserExist = async ({ email, mobile, firstName, lastName, source }) =>
  * Create a new user.
  */
 const createNewUser = async (body) => {
+  // Duplicate email check
+  if (body.email) {
+    const existingUser = await User.findOne({ where: { email: body.email } });
+    if (existingUser) {
+      const error = new Error('Email already registered');
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
+  // Duplicate mobile check
+  if (body.mobile) {
+    const existingMobile = await User.findOne({ where: { mobile: body.mobile } });
+    if (existingMobile) {
+      const error = new Error('Mobile number already registered');
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
   const userData = {
     ...body,
     first_name: body.firstName,
@@ -203,6 +223,11 @@ const login = async ({ email, password, login_as }) => {
  * Resend OTP to email.
  */
 const resendOtp = async (email) => {
+  if (!email) return null;
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) return null;
+
   const otp = generateOTP(6);
   emailTemplateService.verificationOTP({ email, otp }).catch((err) => logger.error(`Resend OTP error: ${err}`));
   return { otp };

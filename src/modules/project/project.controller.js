@@ -5,6 +5,7 @@ import projectService from './project.service';
 
 const ok = (req, res, data, msgKey = 'SIGNUP') => res.status(getHttpStatus('OK')).json({ success: true, data, message: getMessage(req, false, msgKey) });
 const bad = (req, res, msgKey = 'FALSE_RESPONSE') => res.status(getHttpStatus('BAD_REQUEST')).json({ success: false, data: null, message: getMessage(req, false, msgKey) });
+const notFound = (req, res, msgKey = 'PROJECT_NOT_FOUND') => res.status(getHttpStatus('NOT_FOUND')).json({ success: false, data: null, message: getMessage(req, false, msgKey) });
 
 const createClientProject = asyncHandler(async (req, res) => {
   const result = await projectService.createClientProject({ body: req.body, userId: req.user.id });
@@ -18,7 +19,7 @@ const getUserClientProject = asyncHandler(async (req, res) => {
 
 const getUserClientprojectDetailsbyId = asyncHandler(async (req, res) => {
   const result = await projectService.getClientProjectDetailsById(req.params.id);
-  return result ? ok(req, res, result) : bad(req, res);
+  return result ? ok(req, res, result) : notFound(req, res);
 });
 
 const updateUserClientprojectDetailsbyId = asyncHandler(async (req, res) => {
@@ -32,8 +33,15 @@ const updateUserClientprojectStatusbyId = asyncHandler(async (req, res) => {
 });
 
 const getUserClientProjectDetail = asyncHandler(async (req, res) => {
-  const result = await projectService.getClientProjectDetail(req.params.id);
-  return result ? ok(req, res, result) : bad(req, res);
+  try {
+    const result = await projectService.getClientProjectDetail(req.params.id, req.user.id);
+    return result ? ok(req, res, result) : notFound(req, res);
+  } catch (error) {
+    if (error.status === 403) {
+      return res.status(403).json({ success: false, data: null, message: 'Access denied' });
+    }
+    throw error;
+  }
 });
 
 const getClientProjectsListing = asyncHandler(async (req, res) => {
@@ -42,7 +50,11 @@ const getClientProjectsListing = asyncHandler(async (req, res) => {
 });
 
 const updatePublishClientProject = asyncHandler(async (req, res) => {
-  const result = await projectService.updatePublishClientProject(req.body.client_project_id);
+  const projectId = req.body.project_id;
+  if (!projectId) {
+    return res.status(getHttpStatus('BAD_REQUEST')).json({ success: false, data: null, message: 'project_id is required' });
+  }
+  const result = await projectService.updatePublishClientProject(projectId);
   return result ? ok(req, res, result) : bad(req, res);
 });
 

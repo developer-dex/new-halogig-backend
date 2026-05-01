@@ -18,11 +18,14 @@ const isBidValid = async ({ userId, clientId, projectId }) => {
   const clientInfo = await User.findOne({ where: { id: clientId }, attributes: ['country', 'city', 'state'] });
   const clientProject = await ClientProject.findOne({ where: { id: projectId } });
 
+  const clientCountry = clientInfo?.country || null;
+  const clientCity = clientInfo?.city || null;
+
   if (clientProject?.location_preferancer) {
     if (clientProject.location_preferancer === 'country') {
-      if (!activeCountries.map((c) => c.country).includes(clientInfo?.country)) return false;
+      if (clientCountry && !activeCountries.map((c) => c.country).includes(clientCountry)) return false;
     } else if (clientProject.location_preferancer === 'city') {
-      if (clientInfo?.city !== freelancerCity?.city) return false;
+      if (clientCity !== freelancerCity?.city) return false;
     }
   }
 
@@ -54,6 +57,12 @@ const appendResumeUrl = (profiles) => {
  * Create a project bid with optional candidate profiles.
  */
 const createProjectBid = async ({ body, userId, files }) => {
+  // Bug #018: Duplicate bid check — prevent a freelancer from bidding twice on the same project
+  const existingBid = await ProjectBid.findOne({ where: { from_user_id: userId, project_id: body.project_id } });
+  if (existingBid) {
+    return { duplicate: true };
+  }
+
   const clientProject = await ClientProject.findOne({ where: { id: body.project_id } });
   const data = { ...body, from_user_id: userId };
 
@@ -93,44 +102,69 @@ const updateProjectBid = async ({ id, body }) => ProjectBid.update(body, { where
  * Get freelancer bids with pagination.
  */
 const getUserBids = async ({ userId, query }) => {
-  const { limit, page, model_engagement } = query;
-  const { offset, parsedLimit } = calculatePagination(page, limit);
+  try {
+    if (!userId) {
+      return { data: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+    }
 
-  const clientProjectInclude = { model: ClientProject, required: true };
-  if (model_engagement) clientProjectInclude.where = { model_engagement };
+    const { limit, page, model_engagement } = query || {};
+    const { offset, parsedLimit } = calculatePagination(page, limit);
 
-  const [data, totalCount] = await Promise.all([
-    ProjectBid.findAll({
-      where: { from_user_id: userId },
-      include: [clientProjectInclude, { model: CandidateProfile, required: false, as: 'candidateProfiles' }],
-      limit: parsedLimit, offset, order: [['id', 'DESC']],
-    }),
-    ProjectBid.count({ where: { from_user_id: userId }, include: [clientProjectInclude] }),
-  ]);
+    const clientProjectInclude = { model: ClientProject, required: true };
+    if (model_engagement) clientProjectInclude.where = { model_engagement };
 
-  const processedData = data.map((bid) => {
-    const d = bid.toJSON ? bid.toJSON() : bid;
-    d.candidateProfiles = appendResumeUrl(d.candidateProfiles);
-    return d;
-  });
+    // Build include array — only add CandidateProfile if the model is available
+    const includeArray = [clientProjectInclude];
+    if (CandidateProfile) {
+      includeArray.push({ model: CandidateProfile, required: false, as: 'candidateProfiles' });
+    }
 
-  return {
-    data: processedData,
-    pagination: { total: totalCount, page: parseInt(page, 10) || 1, limit: parsedLimit, totalPages: Math.ceil(totalCount / parsedLimit) },
-  };
+    const [data, totalCount] = await Promise.all([
+      ProjectBid.findAll({
+        where: { from_user_id: userId },
+        include: includeArray,
+        limit: parsedLimit, offset, order: [['id', 'DESC']],
+      }),
+      ProjectBid.count({ where: { from_user_id: userId }, include: [clientProjectInclude] }),
+    ]);
+
+    const processedData = data.map((bid) => {
+      const d = bid.toJSON ? bid.toJSON() : bid;
+      d.candidateProfiles = appendResumeUrl(d.candidateProfiles);
+      return d;
+    });
+
+    return {
+      data: processedData,
+      pagination: { total: totalCount, page: parseInt(page, 10) || 1, limit: parsedLimit, totalPages: Math.ceil(totalCount / parsedLimit) },
+    };
+  } catch (error) {
+    console.error('getUserBids error:', error);
+    return { data: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+  }
 };
 
 /**
- * Get bid detail by ID.
+ * Get bid detail by ID — only returns the bid if it belongs to the authenticated user.
+ * Returns 'forbidden' if the bid exists but belongs to a different user.
  */
-const getUserBidDetail = async (bidId) => {
+const getUserBidDetail = async (bidId, userId) => {
+  // Ownership check: only return the bid if from_user_id matches the authenticated user
   const result = await ProjectBid.findAll({
-    where: { id: bidId },
+    where: { id: bidId, from_user_id: userId },
     include: [
       { model: ClientProject, required: false },
       { model: CandidateProfile, required: false, as: 'candidateProfiles' },
     ],
   });
+
+  if (!result || result.length === 0) {
+    // Distinguish 404 (bid doesn't exist) from 403 (bid exists but belongs to another user)
+    const bidExists = await ProjectBid.findByPk(bidId);
+    if (!bidExists) return null; // controller returns 404 / BAD_REQUEST
+    return 'forbidden'; // controller returns 403
+  }
+
   return result.map((bid) => {
     const d = bid.toJSON ? bid.toJSON() : bid;
     d.candidateProfiles = appendResumeUrl(d.candidateProfiles);
@@ -148,7 +182,7 @@ const getUserDetailData = async (bidId) => {
       {
         model: User, as: 'freelancer', required: false,
         include: [
-          { model: Education, required: false },
+          // Education include removed — Bug #073: 'education' table doesn't exist in DB
           { model: ProfessionalDetail, required: false, include: [{ model: Category, required: false }, { model: SubCategory, as: 'subCategories', required: false }] },
           { model: ProjectDetail, required: false },
           { model: Project, required: false },
@@ -193,34 +227,43 @@ const getUserDetailData = async (bidId) => {
  * Get client bids with pagination.
  */
 const getClientBids = async ({ userId, query }) => {
-  const { limit, page, project_id, type } = query;
-  const { offset, parsedLimit } = calculatePagination(page, limit);
+  try {
+    if (!userId) {
+      return { data: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+    }
 
-  const where = { posted_by_user_id: userId };
-  if (project_id) where.id = project_id;
-  if (type) where.model_engagement = type;
+    const { limit, page, project_id, type } = query || {};
+    const { offset, parsedLimit } = calculatePagination(page, limit);
 
-  let isRetainer = false;
-  if (project_id) {
-    const proj = await ClientProject.findOne({ where: { id: project_id, posted_by_user_id: userId }, attributes: ['model_engagement'] });
-    isRetainer = proj?.model_engagement === 'retainer';
+    const where = { posted_by_user_id: userId };
+    if (project_id) where.id = project_id;
+    if (type) where.model_engagement = type;
+
+    let isRetainer = false;
+    if (project_id) {
+      const proj = await ClientProject.findOne({ where: { id: project_id, posted_by_user_id: userId }, attributes: ['model_engagement'] });
+      isRetainer = proj?.model_engagement === 'retainer';
+    }
+
+    const includes = [
+      { model: ClientProject, required: true, where, include: [{ model: User, required: false, attributes: ['first_name', 'middle_name', 'email', 'last_name', 'username', 'id'] }] },
+      { model: User, as: 'freelancer', required: false, attributes: { exclude: ['password'] } },
+    ];
+    if (isRetainer) includes.push({ model: CandidateProfile, as: 'candidateProfiles', required: false });
+
+    const [data, totalCount] = await Promise.all([
+      ProjectBid.findAll({ order: [['id', 'DESC']], include: includes, attributes: { include: subQuery.bidType() }, limit: parsedLimit, offset }),
+      ProjectBid.count({ where: { client_id: userId }, include: [{ model: ClientProject, required: true, where: type ? { model_engagement: type } : {} }] }),
+    ]);
+
+    return {
+      data: data || [],
+      pagination: { total: totalCount || 0, page: parseInt(page, 10) || 1, limit: parsedLimit, totalPages: Math.ceil((totalCount || 0) / parsedLimit) },
+    };
+  } catch (error) {
+    console.error('getClientBids error:', error);
+    return { data: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 } };
   }
-
-  const includes = [
-    { model: ClientProject, required: true, where, include: [{ model: User, required: false, attributes: ['first_name', 'middle_name', 'email', 'last_name', 'username', 'id'] }] },
-    { model: User, as: 'freelancer', required: false, attributes: { exclude: ['password'] } },
-  ];
-  if (isRetainer) includes.push({ model: CandidateProfile, as: 'candidateProfiles', required: false });
-
-  const [data, totalCount] = await Promise.all([
-    ProjectBid.findAll({ order: [['id', 'DESC']], include: includes, attributes: { include: subQuery.bidType() }, limit: parsedLimit, offset }),
-    ProjectBid.count({ where: { client_id: userId }, include: [{ model: ClientProject, required: true, where: type ? { model_engagement: type } : {} }] }),
-  ]);
-
-  return {
-    data,
-    pagination: { total: totalCount, page: parseInt(page, 10) || 1, limit: parsedLimit, totalPages: Math.ceil(totalCount / parsedLimit) },
-  };
 };
 
 /**
@@ -266,9 +309,14 @@ const getClientDeliveryProject = async (userId) => ProjectBid.findAll({
 /**
  * Send milestone to client (freelancer completes).
  */
-const sendMilestoneToClient = async ({ milestoneId, body }) => {
+const sendMilestoneToClient = async ({ milestoneId, body, userId }) => {
   const milestone = await ProjectBidMilestone.findOne({ where: { id: milestoneId } });
-  if (!milestone) return false;
+  if (!milestone) return 'not_found';
+
+  // Ownership check: verify the requesting freelancer owns the bid this milestone belongs to
+  const bid = await ProjectBid.findOne({ where: { id: milestone.project_bid_id } });
+  if (!bid || bid.from_user_id !== userId) return 'forbidden';
+
   await ProjectBidMilestone.update({
     status: body.status, freelancer_remarks: body.freelancer_remarks, freelancer_approved_date: new Date(),
   }, { where: { id: milestoneId } });

@@ -17,7 +17,7 @@ const updateUserStatus = {
     id: Joi.number().integer().required(),
   }),
   body: Joi.object().keys({
-    status: Joi.string().required(),
+    status: Joi.string().valid('incomplete', 'pending', 'approved', 'rejected', 'suspended', 'completed', 'otpVerified').required(),
   }),
 };
 

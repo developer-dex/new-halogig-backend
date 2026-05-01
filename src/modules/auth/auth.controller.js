@@ -33,15 +33,24 @@ const checkUserExist = asyncHandler(async (req, res) => {
  * POST /api/user/create-user
  */
 const createNewUser = asyncHandler(async (req, res) => {
-  const result = await authService.createNewUser(req.body);
-  if (result) {
-    return res.status(getHttpStatus('OK')).json({
-      success: true, data: result, message: getMessage(req, false, 'SIGNUP'),
+  try {
+    const result = await authService.createNewUser(req.body);
+    if (result) {
+      return res.status(getHttpStatus('OK')).json({
+        success: true, data: result, message: getMessage(req, false, 'SIGNUP'),
+      });
+    }
+    return res.status(getHttpStatus('BAD_REQUEST')).json({
+      success: false, data: null, message: getMessage(req, false, 'FALSE_RESPONSE'),
     });
+  } catch (error) {
+    if (error.statusCode === 409) {
+      return res.status(409).json({
+        success: false, data: null, message: error.message,
+      });
+    }
+    throw error;
   }
-  return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, 'FALSE_RESPONSE'),
-  });
 });
 
 /**
@@ -78,6 +87,12 @@ const verifyUserOtp = asyncHandler(async (req, res) => {
  * POST /api/login
  */
 const login = asyncHandler(async (req, res) => {
+  const { password } = req.body || {};
+  if (!password || password.length > 128) {
+    return res.status(getHttpStatus('BAD_REQUEST')).json({
+      success: false, data: null, message: 'Password must not exceed 128 characters',
+    });
+  }
   const result = await authService.login(req.body);
 
   if (result) {
@@ -117,14 +132,15 @@ const resendOtp = asyncHandler(async (req, res) => {
  */
 const requestPasswordReset = asyncHandler(async (req, res) => {
   const result = await authService.requestPasswordReset(req.body);
-  if (result.ok) {
+  // Always return 200 with a generic message regardless of whether the email
+  // exists — prevents email enumeration (Bug #064).
+  if (result.ok || result.code === 'NOT_FOUND') {
     return res.status(getHttpStatus('OK')).json({
       success: true, data: null, message: getMessage(req, false, 'PASSWORD_LINK_SENT'),
     });
   }
-  const msgKey = result.code === 'NOT_FOUND' ? 'EMAIL_NOT_EXIST' : 'FALSE_RESPONSE';
   return res.status(getHttpStatus('BAD_REQUEST')).json({
-    success: false, data: null, message: getMessage(req, false, msgKey),
+    success: false, data: null, message: getMessage(req, false, 'FALSE_RESPONSE'),
   });
 });
 

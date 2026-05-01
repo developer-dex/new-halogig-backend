@@ -20,7 +20,7 @@ const sendMessage = {
     roomId: Joi.number().integer().required(),
   }),
   body: Joi.object().keys({
-    message: Joi.string().required(),
+    message: Joi.string().trim().min(1).required(),
     messageType: Joi.string().valid('text', 'file', 'image', 'google_meet').default('text'),
     fileUrl: Joi.string().allow('', null).optional(),
     fileName: Joi.string().allow('', null).optional(),

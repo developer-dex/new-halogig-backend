@@ -26,6 +26,8 @@
  *                 type: string
  *               firstName:
  *                 type: string
+ *                 maxLength: 255
+ *                 description: Must not exceed 255 characters
  *               lastName:
  *                 type: string
  *               password:
@@ -35,6 +37,8 @@
  *     responses:
  *       200:
  *         description: User created
+ *       400:
+ *         description: Bad request — firstName exceeds 255 characters, or user already exists
  */
 
 /**
@@ -78,11 +82,15 @@
  *                 type: string
  *               password:
  *                 type: string
+ *                 maxLength: 128
+ *                 description: Password must not exceed 128 characters
  *               login_as:
  *                 type: string
  *     responses:
  *       200:
  *         description: Login successful
+ *       400:
+ *         description: Bad request — missing or oversized password (> 128 chars), or invalid credentials
  */
 
 /**
@@ -114,6 +122,10 @@
  *   post:
  *     summary: Request password reset email
  *     tags: [Auth]
+ *     description: >
+ *       Always returns 200 with a generic message regardless of whether the
+ *       email address is registered. This prevents email enumeration attacks.
+ *       If the email is registered, a password reset link is sent to that address.
  *     requestBody:
  *       required: true
  *       content:
@@ -126,7 +138,9 @@
  *                 type: string
  *     responses:
  *       200:
- *         description: Reset email sent
+ *         description: >
+ *           Generic success response — returned for both registered and
+ *           unregistered email addresses to prevent email enumeration.
  */
 
 /**

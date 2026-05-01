@@ -48,7 +48,12 @@ const getUserChatRoomMessages = asyncHandler(async (req, res) => {
   try {
     const result = await chatService.getRoomMessages(req.params.roomId, req.user.id, 'user', req.query);
     return ok(req, res, result, 'MESSAGES_RETRIEVED');
-  } catch (error) { return bad(req, res, error, 'MESSAGES_RETRIEVAL_FAILED'); }
+  } catch (error) {
+    if (error.message === 'Access denied to this chat room') {
+      return res.status(getHttpStatus('FORBIDDEN')).json({ success: false, data: null, error: error.message, message: getMessage(req, false, 'MESSAGES_RETRIEVAL_FAILED') });
+    }
+    return bad(req, res, error, 'MESSAGES_RETRIEVAL_FAILED');
+  }
 });
 
 const createIndividualChatRoom = asyncHandler(async (req, res) => {

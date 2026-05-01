@@ -27,6 +27,7 @@
  *               thumbnail_image: { type: string, format: binary }
  *     responses:
  *       201: { description: Blog created }
+ *       401: { description: Unauthorized - admin token required }
  */
 
 /**
@@ -50,6 +51,26 @@
 
 /**
  * @swagger
+ * /admin/blog/{id}:
+ *   delete:
+ *     summary: Delete a blog post by ID
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *         description: Blog ID
+ *     responses:
+ *       200: { description: Blog deleted successfully }
+ *       401: { description: Unauthorized - admin token required }
+ *       404: { description: Blog not found }
+ */
+
+/**
+ * @swagger
  * /blog/{blog_slug}:
  *   get:
  *     summary: Get a public blog by slug
@@ -59,7 +80,9 @@
  *         name: blog_slug
  *         required: true
  *         schema: { type: string }
+ *         description: Blog slug (only alphanumeric, hyphens, and underscores allowed)
  *     responses:
  *       200: { description: Blog details }
+ *       400: { description: Invalid slug (contains only special characters) }
  *       404: { description: Blog not found }
  */
